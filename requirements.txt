@@ -1,0 +1,6 @@
+torch==1.12
+tqdm
+networkx
+graph-tool==2.45
+python-igraph>=0.10
+livelossplot
