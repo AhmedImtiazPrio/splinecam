@@ -1,2 +1,2 @@
-# SplineCAM
-SplineCAM: 
+# ENVI: Exact Neural Visualization Toolbox
+
