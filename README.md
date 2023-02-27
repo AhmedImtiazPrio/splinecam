@@ -27,7 +27,7 @@ Examples are placed under the `./example` folder. Google colabs are also provide
 | Characterizing training, test and off-manifold points for VGG11  | characterize_vgg.py | 
 
 
-## Requirements
+## Requirements and Setup
 
 
 ## Release Notes
