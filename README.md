@@ -22,7 +22,7 @@ The SplineCam python toolbox can wrap any given Pytorch sequential network, cont
 Currently supported Pytorch modules are:
 ```
 torch.nn.modules.linear.Linear,
-torch.nn.modules.Sequential, ##used to skip layers
+torch.nn.modules.Sequential, ##also used to skip layers
 torch.nn.modules.BatchNorm1d,
 torch.nn.modules.Conv2d,
 torch.nn.modules.BatchNorm2d,
@@ -35,8 +35,15 @@ SplineCam is theoretically exact for any piecewise linear activation function, e
 torch.nn.modules.activation.ReLU,
 torch.nn.modules.activation.LeakyReLU,
 ```
-
 ### Usage
+
+
+### TO DOs
+
+1. Convert all igraph to graph-tool
+2. Add per layer visualization support. Save meta for layer index in graph for each edge.
+3. Add support for periodic activation functions
+4. Add support for skip connections
 
 ### Citation
 ```
