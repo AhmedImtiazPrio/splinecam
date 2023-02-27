@@ -28,7 +28,21 @@ Examples are placed under the `./example` folder. Google colabs are also provide
 | VGG11 | tinyimagenet-200 | - |  
 
 
-## Requirements and Setup
+## Requirements
+
+SplineCam is mostly implemented using Pytorch and Graph-tool. All the linear algebra operations are performed using Pytorch and are vectorized, therefore scalable using GPUs. The Graph-tool operations are single threaded.
+
+```
+torch>=1.9,<=1.12
+tqdm
+networkx
+python-igraph>=0.10
+graph-tool==2.45
+livelossplot ## to keep track of training
+```
+
+## Setup
+
 
 
 ## Release Notes
@@ -54,9 +68,6 @@ SplineCam is theoretically exact for any piecewise linear activation function, e
 torch.nn.modules.activation.ReLU,
 torch.nn.modules.activation.LeakyReLU,
 ```
-
-## Usage
-
 
 ## To do
 
