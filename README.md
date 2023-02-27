@@ -15,12 +15,13 @@ https://user-images.githubusercontent.com/32792313/221407228-86f1a36b-1d88-43f6-
 
 **Video**: SplineCam visualizations during training of a binary classifier MLP with width 10 and depth 5. Regions are colored by the norm of their corresponding slope parameters. Notice how the function keeps changing even when the decision boundary has converged, especially away from the training data. 
 
-### Release Notes
+## Release Notes
 
 The SplineCam python toolbox can wrap any given Pytorch sequential network, containing a set of supported modules. While the number of modules currently supported is not exhaustive, we will be adding support for newer Pytorch modules over time.
 
 Currently supported Pytorch modules are:
-```
+
+```python
 torch.nn.modules.linear.Linear,
 torch.nn.modules.Sequential, ##also used to skip layers
 torch.nn.modules.BatchNorm1d,
@@ -30,22 +31,25 @@ torch.nn.modules.Flatten,
 torch.nn.modules.AvgPool2d,
 torch.nn.modules.Dropout
 ```
+
 SplineCam is theoretically exact for any piecewise linear activation function, e.g., LeakyReLU, Sawtooth. Currently supported activation functions are:
-```
+
+```python
 torch.nn.modules.activation.ReLU,
 torch.nn.modules.activation.LeakyReLU,
 ```
-### Usage
+
+## Usage
 
 
-### TO DOs
+## To do
 
 1. Convert all igraph to graph-tool
 2. Add per layer visualization support. Save meta for layer index in graph for each edge.
 3. Add support for periodic activation functions
 4. Add support for skip connections
 
-### Citation
+## Citation
 ```
 @inproceedings{
 humayun2022exact,
