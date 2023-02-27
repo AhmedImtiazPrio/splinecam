@@ -17,6 +17,25 @@ https://user-images.githubusercontent.com/32792313/221407228-86f1a36b-1d88-43f6-
 
 ### Release Notes
 
+The SplineCam python toolbox can wrap any given Pytorch sequential network, containing a set of supported modules. While the number of modules currently supported is not exhaustive, we will be adding support for newer Pytorch modules over time.
+
+Currently supported Pytorch modules are:
+```
+torch.nn.modules.linear.Linear,
+torch.nn.modules.Sequential, ##used to skip layers
+torch.nn.modules.BatchNorm1d,
+torch.nn.modules.Conv2d,
+torch.nn.modules.BatchNorm2d,
+torch.nn.modules.Flatten,
+torch.nn.modules.AvgPool2d,
+torch.nn.modules.Dropout
+```
+SplineCam is theoretically exact for any piecewise linear activation function, e.g., LeakyReLU, Sawtooth. Currently supported activation functions are:
+```
+torch.nn.modules.activation.ReLU,
+torch.nn.modules.activation.LeakyReLU,
+```
+
 ### Usage
 
 ### Citation
