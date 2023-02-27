@@ -24,7 +24,7 @@ Examples are placed under the `./example` folder. Google colabs are also provide
 | Toy 2D Two Moons, Two Circles, Two Blobs | toy2d.py |  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://bit.ly/splinecam-demo)
 | Implicit Neural Representation fitting 2D image | 2d_inr.ipynb | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://bit.ly/splinecam-demo-anon)
 | Random MLP with arbitrary width and dimensions | random_mlp_visualize.py | 
-| Characterizing training set and test sets VGG11  | characterize_vgg.py | 
+| Characterizing training, test and off-manifold points for VGG11  | characterize_vgg.py | 
 
 
 ## Requirements
