@@ -1,7 +1,7 @@
 ## *SplineCam*: Exact Visualization and Characterization of Deep Network Geometry and Decision Boundaries
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://bit.ly/splinecam-demo)
 
-### [Paper Link](#) | [Website](https://bit.ly/splinecam)
+### [Paper Link](https://arxiv.org/abs/2302.12828) | [Website](https://bit.ly/splinecam)
 <img src="https://user-images.githubusercontent.com/32792313/221405026-ba0e1d12-5a25-4937-9cdc-b97a84dd1d8f.jpg" height="200">
 
 Fig: Learned implicit surface by a Neural SDF with annotations for three 2D slices (Left). SplineCam visualizations for annotated 2D slices (Rest)
@@ -14,6 +14,10 @@ Fig: Learned implicit surface by a Neural SDF with annotations for three 2D slic
 https://user-images.githubusercontent.com/32792313/221407228-86f1a36b-1d88-43f6-abba-1554049c842c.mp4
 
 **Video**: SplineCam visualizations during training of a binary classifier MLP with width 10 and depth 5. Regions are colored by the norm of their corresponding slope parameters. Notice how the function keeps changing even when the decision boundary has converged, especially away from the training data. 
+
+### Release Notes
+
+### Usage
 
 ### Citation
 ```
