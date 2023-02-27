@@ -1,4 +1,4 @@
-## *SplineCam*: Exact Visualization and Characterization of Deep Network Geometry and Decision Boundaries
+## *SplineCam*: Exact Visualization and Characterization of Deep Network Geometry and Decision Boundaries, CVPR 2023
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://bit.ly/splinecam-demo)
 
 ### [Paper Link](https://arxiv.org/abs/2302.12828) | [Website](https://bit.ly/splinecam)
