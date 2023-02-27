@@ -19,13 +19,13 @@ https://user-images.githubusercontent.com/32792313/221407228-86f1a36b-1d88-43f6-
 
 Examples are placed under the `./example` folder. Google colabs are also provided for some.
 
-| Title | Filename | Link
-| :---- | :---- | :----
-| Toy 2D Two Moons, Two Circles, Two Blobs | toy2d.py |  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://bit.ly/splinecam-demo)
-| Implicit Neural Representation fitting 2D image | 2d_inr.ipynb | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://bit.ly/splinecam-demo-anon)
-| Random MLP with arbitrary width | visualize_mlp_random.py | [Link](https://github.com/AhmedImtiazPrio/splinecam/blob/main/examples/visualize_mlp_random.py)
-| Random CNN with arbitrary width | visualize_cnn_random.py | [Link](https://github.com/AhmedImtiazPrio/splinecam/blob/main/examples/visualize_cnn_random.py)
-| Characterizing training, test and off-manifold points for VGG11  | characterize_vgg.py | 
+| Model | Data | Filename | Link
+| :---- | :---- | :---- | :----
+| MLP | Two Moons, Two Circles, Two Blobs | toy2d.py |  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://bit.ly/splinecam-demo)
+| Implicit Neural Representation | 2D image | 2d_inr.ipynb | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://bit.ly/splinecam-demo-anon)
+| MLP | randomly initialized | visualize_mlp_random.py | [Link](https://github.com/AhmedImtiazPrio/splinecam/blob/main/examples/visualize_mlp_random.py)
+| CNN | randomly initialized | visualize_cnn_random.py | [Link](https://github.com/AhmedImtiazPrio/splinecam/blob/main/examples/visualize_cnn_random.py)
+| VGG11 | tinyimagenet-200 | - |  
 
 
 ## Requirements and Setup
