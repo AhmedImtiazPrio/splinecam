@@ -28,6 +28,40 @@ Examples are placed under the `./example` folder. Google colabs are also provide
 | VGG11 | tinyimagenet-200 | - |  
 
 
+## Usage
+
+To begin, first we have to define a 2D input space region of interest that we wish to visualize. The region of interest can be a polytopal region **P** at the input of the network defined via a set of vertices. Since all the region finding operations are performed in 2D, we also require a projection operator that projects vectors from the input space onto **P**. The following shows how to wrap any torch sequential for visualization
+
+```python
+import torch
+import splinecam
+
+## given torch network `model` and region of interest `domain`
+
+T = splinecam.utils.get_proj_mat(domain)
+
+model.cuda()
+model.eval()
+model.type(torch.float64)
+
+print('Wrapping model with SplineCam...')
+NN = splinecam.wrappers.model_wrapper(
+    model,
+    input_shape=model.input_shape,
+    T = T,
+    dtype = torch.float64,
+    device = 'cuda'
+)
+
+## check .forward() and matmul operation equivalence
+print('Verifying wrapped model...')
+flag =  NN.verify()
+print('Model.forward and matmul equivalence check', flag)
+assert flag
+
+```
+
+
 ## Requirements
 
 SplineCam is mostly implemented using Pytorch and Graph-tool. All the linear algebra operations are performed using Pytorch and are vectorized, therefore scalable using GPUs. The Graph-tool operations are single threaded.
