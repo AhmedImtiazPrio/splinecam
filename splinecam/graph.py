@@ -1067,3 +1067,99 @@ def compute_partitions_with_db(
         endpoints = [None]
         
     return out_cyc,endpoints
+
+
+def compute_partitions(
+    domain,
+    T,
+    NN,
+    fwd_batch_size = 1024,
+    batch_size = 128,
+    n_workers = 2,
+    Abw_batch_size = 16,
+):
+    
+    poly = (T[...,:-1].T @ (domain.T - T[...,-1:])).T
+    poly = poly.type(torch.float64)
+
+    start_time = time.time()
+
+    ### Get partitions
+
+    Abw = NN.layers[0].get_weights()[None,...].cpu()
+
+    out_cyc = [poly]
+
+
+    for current_layer in range(1,len(NN.layers)-1):
+        print(f'Current layer {current_layer}')
+
+        out_cyc,out_idx = to_next_layer_partition_batched(
+            cycles = out_cyc,
+            Abw = Abw,
+            NN = NN,
+            current_layer = current_layer,
+            dtype = torch.float64,
+            batch_size=batch_size,
+            fwd_batch_size=fwd_batch_size,
+        )
+
+        with torch.no_grad():
+
+            means = get_region_means(out_cyc, dims=out_cyc[0].shape[-1], device = 'cpu', dtype=torch.float64)
+
+            fused_op = lambda x:NN.layers[
+                current_layer
+            ].get_activation_pattern(
+                NN.layers[:current_layer].forward(x)
+            ).cpu().type(torch.float32)
+
+
+            q = _batched_gpu_op(method=fused_op,
+                            data=means,
+                            batch_size=fwd_batch_size,
+                            out_size=(
+                                means.shape[0],torch.prod(NN.layers[current_layer].output_shape)
+                            ),
+                            dtype= torch.float32,
+                            workers=n_workers,
+                )
+
+
+            del means
+
+            Wb =  NN.layers[current_layer].get_weights(dtype=torch.float32).cuda()
+            Abw = Abw.type(torch.float32)
+
+            dloader = torch.utils.data.DataLoader(Abw,
+                                          pin_memory=True,
+                                          batch_size=Abw_batch_size,
+                                          num_workers=n_workers,
+                                          shuffle=False,
+                                          sampler=out_idx,
+                                          drop_last=False)
+
+            out_Abw = torch.zeros(len(out_idx),Wb.shape[0],Abw.shape[-1], device='cpu', dtype=torch.float32)
+
+            start = 0
+            for in_batch in tqdm.tqdm(dloader,desc='Get Abw',total=len(dloader)):
+
+                end = start+in_batch.shape[0]
+
+                out_batch = get_Abw(
+                        q = q[start:end].cuda(),
+                        Wb = Wb.to_dense(),
+                        incoming_Abw = in_batch.cuda()
+                            ) 
+
+                out_Abw[start:end] = out_batch.cpu()
+                start = end
+
+            Abw = out_Abw.type(torch.float64)
+
+        del Wb, out_Abw
+
+    elapsed_time = time.time()-start_time
+    print(f'Time elapsed {elapsed_time/60:.3f} minutes')
+
+    return out_cyc,endpoints
