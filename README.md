@@ -60,7 +60,17 @@ print('Model.forward and matmul equivalence check', flag)
 assert flag
 
 ```
+Compute the partitions on **P** along with the decision boundary and plot
+```python
+regions, db_edges = splinecam.compute.get_partitions_with_db(domain,T,NN)
 
+fig,ax = plt.subplots()
+splinecam.plot.plot_partition(regions,
+                              alpha=0.3, edgecolor='#a70000',ax=ax,
+                              color_range=[.3,.8], linewidth=.5)
+for each in db_edges:
+    ax.plot(each[:,0], each[:,1], c='r', linewidth=5)
+```
 
 ## Requirements
 
