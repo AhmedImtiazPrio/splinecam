@@ -158,6 +158,15 @@ torch.nn.modules.activation.LeakyReLU,
 
 ## Citation
 ```
+
+@inproceedings{humayun2022splinecam,
+  title={SplineCam: Exact Visualization and Characterization of Deep Network Geometry and Decision Boundaries},
+  author={Humayun, Ahmed Imtiaz and Balestriero, Randall and Balakrishnan, Guha and Baraniuk, Richard},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  year={2023}
+}
+
+
 @inproceedings{
 humayun2022exact,
 title={Exact Visualization of Deep Neural Network Geometry and Decision Boundary},
