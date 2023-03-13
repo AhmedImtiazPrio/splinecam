@@ -10,6 +10,7 @@ from splinecam import utils
 from splinecam import graph
 
 import tqdm
+import time
 
 @torch.no_grad()
 def get_hyp_endpoints(poly,hyps,verify=True):
