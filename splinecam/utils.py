@@ -189,7 +189,9 @@ def split_domain_by_edge(domain):
 
 @torch.jit.script
 def get_square_slice_from_one_anchor(anchors,pad_dist=1,seed=None):
-    
+    """
+    Given one vector as an anchor, takes a randomly oriented slice with the anchor at the center
+    """
 #     if seed is not None:
 #         torch.manual_seed(seed)
     

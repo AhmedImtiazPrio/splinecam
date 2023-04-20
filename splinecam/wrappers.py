@@ -292,6 +292,7 @@ class model_wrapper(object):
     
     @torch.no_grad()
     def __init__(self, model, input_shape=None, is_classifier=False,
+                 custom_layers = [], custom_activations = [], 
                  device='cuda',as_sequential=True,T=None, dtype=torch.float32):
         
         self.device = device
@@ -300,6 +301,8 @@ class model_wrapper(object):
         self.T = T
         self.input_shape = input_shape
         self.is_classifier = is_classifier
+        self.custom_layers = custom_layers
+        self.custom_activations = custom_activations
         
         if model.training:
             raise ValueError('Model should always be supplied in eval mode. Please do `model.eval()` before wrapping')
@@ -320,6 +323,11 @@ class model_wrapper(object):
             
     @torch.no_grad()        
     def compose_layers(self,layers,layer_names):
+        
+        global SUPPORTED_MODULES, SUPPORTED_ACT
+        
+        SUPPORTED_MODULES += self.custom_layers
+        SUPPORTED_ACT += self.custom_activations
         
         not_supported = [type(each) for i,each in enumerate(layers) if not type(
             each) in SUPPORTED_MODULES+SUPPORTED_ACT]
@@ -351,23 +359,33 @@ class model_wrapper(object):
             elif type(layer) == torch.nn.modules.AvgPool2d:
                 
                 if current_shape is None:
-                    raise ValueError('Please specify model input shape for conv networks')
+                    raise ValueError('Please specify model input shape for avgpool networks')
                     
                 new_layers.append(avgpool2d(layer,input_shape=current_shape,
                                             device=self.device,dtype=self.dtype)
                                  )
                 current_shape = new_layers[-1].output_shape
+            
+            elif type(layer) in self.custom_layers:
                 
+                if current_shape is None:
+                    raise ValueError('Please specify model input shape for avgpool networks')
+                    
+                
+                layer.device = self.device
+                layer.dtype = self.dtype
+                layer.input_shape = current_shape
+                
+                new_layers.append(layer)
+                
+                current_shape = new_layers[-1].output_shape
+             
             
             elif type(layer) == torch.nn.modules.Flatten:
                 pass ## conv outputs are already flattened via x.reshape(-1)
                 
             ## if act add to prev layer
-            elif type(
-                layer
-            ) == torch.nn.modules.activation.ReLU or type(
-                layer
-            ) == torch.nn.modules.activation.LeakyReLU:
+            elif type(layer) in SUPPORTED_ACT:
                 new_layers[-1].add_act(layer)
             
             ## if bn add to prev layer
@@ -430,7 +448,8 @@ class conv2d(torch.nn.Module):
     """
     
     def __init__(self,conv2d_layer,input_shape,
-                 act_layer=None,bn_layer=None,name='conv2d_layer',
+                 act_layer=None,bn_layer=None,custom_activations=None,
+                 name='conv2d_layer',
                  device='cuda', dtype=torch.float32):
         '''
         Wrapper for linear layer with batchnorm and/or ReLU activation
@@ -441,15 +460,22 @@ class conv2d(torch.nn.Module):
         self.device = device
         self.name = name
         self.dtype = dtype
+        self.custom_activations = custom_activations
         
         self.input_shape = torch.tensor(input_shape)
         self.layer = conv2d_layer.to(self.device).type(self.dtype)
         
         #enforcing symmetric
-        assert self.layer.stride[0] == self.layer.stride[1] 
-        assert self.layer.padding[0] == self.layer.padding[1]
-        assert self.layer.kernel_size[0] == self.layer.kernel_size[1]
-        assert self.layer.kernel_size[0] - 2*self.layer.padding[0] == 1 ## padding same
+        assert self.layer.stride[0] == self.layer.stride[1]        
+        if not self.layer.kernel_size[0] == self.layer.kernel_size[1]:
+            warnings.warn(f'Kernel size {self.layer.kernel_size} non symmetric')
+            
+        if not type(self.layer.padding) == str:
+            assert self.layer.padding[0] == self.layer.padding[1]
+            assert self.layer.kernel_size[0] - 2*self.layer.padding[0] == 1 ## padding same
+
+        else:
+            warnings.warn(f'Padding {self.layer.padding}')
         
         self.n_kernels = self.layer.weight.shape[0]
         self.stride = self.layer.stride[0]
@@ -505,6 +531,10 @@ class conv2d(torch.nn.Module):
             
         elif type(self.act) == torch.nn.modules.activation.ReLU:
             self.act_name = 'relu'
+            
+        elif type(self.act) in self.custom_activations:
+            self.act_name = 'custom'
+            raise NotImplementedError('Custom activation support not implemented')
             
         else:
             raise NotImplementedError('Activation func not supported')
