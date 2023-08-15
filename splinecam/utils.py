@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.spatial import ConvexHull
 import torch
+import warnings
 
 @torch.jit.script
 def region_eccentricity_2d(poly,eps=1e-10):
@@ -215,22 +216,18 @@ def get_square_slice_from_one_anchor(anchors,pad_dist=1,seed=None):
 
 
 @torch.jit.script
-def get_square_slice_from_two_anchors(anchors,pad_dist=1,seed=0):
+def get_square_slice_from_two_anchors(anchors,pad_dist=1,seed=-1):
     
-    torch.manual_seed(seed)
+    if not seed == -1: #None buggy for jit
+        torch.manual_seed(seed)
     
-    assert len(anchors) >= 2
+    assert len(anchors) == 2
     
-    centroid = torch.mean(anchors[:2],dim=0)
+    centroid = torch.mean(anchors,dim=0)
     
-    if len(anchors) < 3:
-        u1 = anchors[0]
-        z = torch.randn_like(anchors[0])
-        u2 = z - (u1.T @ z)/(u1.T @ u1)*u1
-        
-    else:
-        u1 = anchors[0]
-        u2 = anchors[2] - (u1.T @ anchors[2])/(u1.T @ u1)*u1
+    u1 = anchors[0] - centroid
+    z = torch.randn_like(anchors[0])
+    u2 = z - (u1.T @ z)/(u1.T @ u1)*u1
     
     dirs = torch.vstack([u1,u2])
     dirs /= torch.linalg.norm(dirs,dim=-1,keepdim=True)
@@ -241,17 +238,23 @@ def get_square_slice_from_two_anchors(anchors,pad_dist=1,seed=0):
 
 
 @torch.jit.script
-def get_square_slice_from_centroid(anchors,pad_dist=1,seed=0):
+def get_square_slice_from_centroid(anchors,pad_dist=1,seed=0,eps=1e-7):
     
+    assert len(anchors.shape) <= 2
     assert len(anchors) == 3
     
     centroid = torch.mean(anchors,dim=0)
     
-    u1 = anchors[0]
-    u2 = anchors[1] - (u1.T @ anchors[1])/(u1.T @ u1)*u1
+    u1 = anchors[0] - centroid
+    
+    u2_n = anchors[1] - centroid
+    u2 = u2_n - (u1.T @ u2_n)/(u1.T @ u1 + eps)*u1
+    
+    assert u1.T @ u2 < eps
     
     dirs = torch.vstack([u1,u2])
     dirs /= torch.linalg.norm(dirs,dim=-1,keepdim=True)
+    
     domain = torch.vstack([centroid+pad_dist*dirs,centroid-pad_dist*dirs])
     domain_poly = torch.vstack([domain,domain[:1]])
     
