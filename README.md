@@ -23,6 +23,7 @@ Examples are placed under the `./example` folder. Google colabs are also provide
 | :---- | :---- | :---- | :----
 | MLP | Two Moons, Two Circles, Two Blobs | toy2d.py |  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://bit.ly/splinecam-demo)
 | MLP - Implicit Neural Representation | 2D image | 2d_inr.ipynb | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://bit.ly/splinecam-demo-anon)
+| Scattering Network | 1D Signal/Audio | scattering.ipynb | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://bit.ly/scattering-cam)
 | MLP | randomly initialized | visualize_mlp_random.py | [Link](https://github.com/AhmedImtiazPrio/splinecam/blob/main/examples/visualize_mlp_random.py)
 | CNN | randomly initialized | visualize_cnn_random.py | [Link](https://github.com/AhmedImtiazPrio/splinecam/blob/main/examples/visualize_cnn_random.py)
 | VGG11 | tinyimagenet-200 | - |  
@@ -60,7 +61,17 @@ print('Model.forward and matmul equivalence check', flag)
 assert flag
 
 ```
+Compute the partitions on **P** along with the decision boundary and plot
+```python
+regions, db_edges = splinecam.compute.get_partitions_with_db(domain,T,NN)
 
+fig,ax = plt.subplots()
+splinecam.plot.plot_partition(regions,
+                              alpha=0.3, edgecolor='#a70000',ax=ax,
+                              color_range=[.3,.8], linewidth=.5)
+for each in db_edges:
+    ax.plot(each[:,0], each[:,1], c='r', linewidth=5)
+```
 
 ## Requirements
 
@@ -100,7 +111,7 @@ pip install --force-reinstall pycairo
 Install misc network libraries (will be removed in future release)
 ```bash
 pip install networkx
-pip install python-igraph>=0.10
+pip install igraph>=0.10
 ```
 
 Install misc dependencies
@@ -148,6 +159,15 @@ torch.nn.modules.activation.LeakyReLU,
 
 ## Citation
 ```
+
+@inproceedings{humayun2022splinecam,
+  title={SplineCam: Exact Visualization and Characterization of Deep Network Geometry and Decision Boundaries},
+  author={Humayun, Ahmed Imtiaz and Balestriero, Randall and Balakrishnan, Guha and Baraniuk, Richard},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  year={2023}
+}
+
+
 @inproceedings{
 humayun2022exact,
 title={Exact Visualization of Deep Neural Network Geometry and Decision Boundary},
