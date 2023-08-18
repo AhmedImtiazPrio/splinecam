@@ -35,10 +35,19 @@ def plot_partition(cycles,ax=None,xlims=[-2,2],ylims=[-2,2],
                 polygon.set_alpha(alpha)
                 ax.add_patch(polygon)
                 
-    else:
+    elif len(colors) != len(cycles):
         
         for cyc in tqdm.tqdm(cycles,total=len(cycles)):
                 polygon = mpl_Polygon(cyc, True, facecolor=colors[np.random.randint(0,len(colors))])
+                polygon.set_edgecolor(edgecolor)
+                polygon.set_linewidth(linewidth)
+                polygon.set_alpha(alpha)
+                ax.add_patch(polygon)
+                
+    elif len(colors) == len(cycles):
+        
+        for cyc,col in tqdm.tqdm(zip(cycles,colors),total=len(cycles)):
+                polygon = mpl_Polygon(cyc, True, facecolor=col)
                 polygon.set_edgecolor(edgecolor)
                 polygon.set_linewidth(linewidth)
                 polygon.set_alpha(alpha)
