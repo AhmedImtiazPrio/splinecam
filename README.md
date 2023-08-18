@@ -111,7 +111,7 @@ pip install --force-reinstall pycairo
 Install misc network libraries (will be removed in future release)
 ```bash
 pip install networkx
-pip install python-igraph>=0.10
+pip install igraph>=0.10
 ```
 
 Install misc dependencies
