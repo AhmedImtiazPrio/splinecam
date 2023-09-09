@@ -7,6 +7,8 @@ import splinecam as sc
 import torch
 import matplotlib.pyplot as plt
 
+### define model
+
 model = torch.nn.Sequential(
     *[
         torch.nn.Conv2d(3, 6, 5, stride=2, padding=2, bias=False),
@@ -24,46 +26,38 @@ model = torch.nn.Sequential(
 model.eval()
 model.type(torch.float64)
 
+### define input domain to compute partitions
+
+# prescribe input domain for partition computation
+domain = sc.utils.get_square_slice_from_one_anchor(torch.randn(1,3*32*32),
+                                                   pad_dist=2,
+                                                   seed=None)
+
+# compute linear projection from input space to target domain
+T = sc.utils.get_proj_mat(domain)
+
+# wrap model with splinecam library
 NN = sc.wrappers.model_wrapper(
     model,
     input_shape=(3,32,32),
-    T = torch.randn(3*32*32,2),
+    T = T,
     dtype = torch.float64
 )
 
 print('forward and affine equivalency flag ', NN.verify())
 
-global_dtype = torch.float64
+### Compute regions and decision boundary
 
-poly = sc.utils.create_polytope_2d(scale=1,seed=10)+2
-poly = torch.from_numpy(poly).cuda().to(global_dtype)
+out_cyc,endpoints,Abw = sc.compute.get_partitions_with_db(domain,T,NN)
 
-Abw = NN.layers[0].get_weights()[None,...]
-out_cyc = [poly]
+### Plot partitions
 
-for current_layer in range(1,len(NN.layers)):
+minval,_ = torch.vstack(out_cyc).min(0)
+maxval,_ = torch.vstack(out_cyc).max(0)
 
-    out_cyc,out_idx = sc.graph.to_next_layer_partition(
-        cycles = out_cyc,
-        Abw = Abw,
-        NN = NN,
-        current_layer = current_layer,
-        dtype = global_dtype
-    )
-    
-    with torch.no_grad():
-
-        means = sc.utils.get_region_means(out_cyc, dims=out_cyc[0].shape[-1], dtype=global_dtype)
-        means = NN.layers[:current_layer].forward(means.cuda())
-
-        Abw = sc.utils.get_Abw(
-            q = NN.layers[current_layer].get_activation_pattern(means),
-            Wb = NN.layers[current_layer].get_weights(),
-            incoming_Abw = Abw[out_idx]
-                )
-    
-sc.plot.plot_partition(out_cyc, xlims=[poly[:,0].cpu().min().numpy(),
-                                         poly[:,0].cpu().max().numpy()],
-                         ylims=[poly[:,1].cpu().min().numpy(),poly[:,1].cpu().max().numpy()])
+sc.plot.plot_partition(out_cyc, xlims=[minval[0],maxval[0]],alpha=0.3,
+                         edgecolor='#a70000',color_range=[.3,.8],
+                         colors=['#469597', '#5BA199', '#BBC6C8', '#E5E3E4', '#DDBEAA'],
+                         ylims=[minval[1],maxval[1]], linewidth=.5)
 
 plt.savefig('../figures/cnn_visualize.jpg',transparent=True, bbox_inches=0, pad_inches=0)

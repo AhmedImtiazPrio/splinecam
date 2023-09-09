@@ -9,6 +9,7 @@ import splinecam as sc
 import torch
 import matplotlib.pyplot as plt
 
+### model definition
 
 in_shape = 10
 out_shape = 1
@@ -19,60 +20,55 @@ act = torch.nn.LeakyReLU(0.03)
 
 layers = []
 
-offset = 1
-
-layers.append(torch.nn.Linear(in_shape,width+offset))
+layers.append(torch.nn.Linear(in_shape,width))
 layers.append(act)
 
 
 for i in range(depth-1):
-    layers.append(torch.nn.Linear(width+offset,width+offset+1))
-    layers.append(torch.nn.BatchNorm1d(width+offset+1))
+    layers.append(torch.nn.Linear(width,width))
+    layers.append(torch.nn.BatchNorm1d(width))
     layers.append(act)
-    offset += 1
     
-layers.append(torch.nn.Linear(width+offset,out_shape))
-
+layers.append(torch.nn.Linear(width,out_shape))
 
 model = torch.nn.Sequential(*layers)
 model.cuda()
 
+model.eval()
+model.type(torch.float64)
 
-## wrap model 
-global_dtype = torch.float64
+### define input domain to compute partitions
 
-model.eval().cuda()
-model.type(global_dtype)
-NN = sc.wrappers.model_wrapper(model, T=torch.randn(10,2), dtype=global_dtype)
-print('forward and affine equivalency flag', NN.verify())
+# prescribe input domain for partition computation
+domain = sc.utils.get_square_slice_from_one_anchor(torch.randn(1,in_shape),
+                                                   pad_dist=2,
+                                                   seed=None)
 
-## input region
-poly = sc.utils.create_polytope_2d(scale=1,seed=10)
-poly = torch.from_numpy(poly).cuda().to(global_dtype)
+# compute linear projection from input space to target domain
+T = sc.utils.get_proj_mat(domain)
 
-Abw = NN.layers[0].get_weights()[None,...]
-out_cyc = [poly]
+# wrap model with splinecam library
+NN = sc.wrappers.model_wrapper(
+    model,
+    input_shape=(in_shape,),
+    T = T,
+    dtype = torch.float64
+)
 
-for current_layer in range(1,len(NN.layers)):
+print('forward and affine equivalency flag ', NN.verify())
 
-    out_cyc,out_idx = sc.graph.to_next_layer_partition(
-        cycles = out_cyc,
-        Abw = Abw,
-        NN = NN,
-        current_layer = current_layer,
-        dtype = global_dtype
-    )
-    
-    with torch.no_grad():
+### Compute regions and decision boundary
 
-        means = sc.utils.get_region_means(out_cyc, dims=out_cyc[0].shape[-1], dtype=global_dtype)
-        means = NN.layers[:current_layer].forward(means.cuda())
+out_cyc,endpoints,Abw = sc.compute.get_partitions_with_db(domain,T,NN)
 
-        Abw = sc.utils.get_Abw(
-            q = NN.layers[current_layer].get_activation_pattern(means),
-            Wb = NN.layers[current_layer].get_weights(),
-            incoming_Abw = Abw[out_idx]
-                )
-    
-sc.plot.plot_partition(out_cyc, xlims=[-.8,.8], ylims=[-.8,.8], color_range=[.4,.8])
+### Plot partitions
+
+minval,_ = torch.vstack(out_cyc).min(0)
+maxval,_ = torch.vstack(out_cyc).max(0)
+
+sc.plot.plot_partition(out_cyc, xlims=[minval[0],maxval[0]],alpha=0.3,
+                         edgecolor='#a70000',color_range=[.3,.8],
+                         colors=['#469597', '#5BA199', '#BBC6C8', '#E5E3E4', '#DDBEAA'],
+                         ylims=[minval[1],maxval[1]], linewidth=.5)
+
 plt.savefig('../figures/mlp_visualize.jpg',transparent=True, bbox_inches=0, pad_inches=0)
