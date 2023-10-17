@@ -96,17 +96,15 @@ git clone https://github.com/AhmedImtiazPrio/splinecam.git
 
 Setup graph-tool and pycairo
 ```bash
-echo "deb http://downloads.skewed.de/apt bionic main" >> /etc/apt/sources.list
+echo "deb http://downloads.skewed.de/apt jammy main" >> /etc/apt/sources.list
 apt-key adv --keyserver keyserver.ubuntu.com --recv-key 612DEFB798507F25
-
-echo "deb http://cz.archive.ubuntu.com/ubuntu bionic main universe" >> /etc/apt/sources.list
 apt-get update
 apt-get install python3-graph-tool python3-matplotlib python3-cairo
 
-#python3-cairo from Ubuntu's reposity is linked with a different python version; we need to improvise
 apt purge python3-cairo
 apt install libcairo2-dev pkg-config python3-dev
 pip install --force-reinstall pycairo
+pip install zstandard
 ```
 
 Install misc network libraries (will be removed in future release)
