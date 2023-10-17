@@ -22,6 +22,7 @@ Examples are placed under the `./example` folder. Google colabs are also provide
 | Model | Data | Filename | Link
 | :---- | :---- | :---- | :----
 | MLP | Two Moons, Two Circles, Two Blobs | toy2d.py |  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://bit.ly/splinecam-demo)
+| MLP | f : 2 &rarr; 1 | -- |  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1U9Ql5Ww3dJdgTTQvXOKqVgflWTr1kD3s)
 | MLP - Implicit Neural Representation | 2D image | 2d_inr.ipynb | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://bit.ly/splinecam-demo-anon)
 | Scattering Network | 1D Signal/Audio | scattering.ipynb | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://bit.ly/scattering-cam)
 | MLP | randomly initialized | visualize_mlp_random.py | [Link](https://github.com/AhmedImtiazPrio/splinecam/blob/main/examples/visualize_mlp_random.py)
