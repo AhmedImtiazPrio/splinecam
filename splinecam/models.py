@@ -1,7 +1,7 @@
 from torchvision import models
 import torch.nn as nn
 
-def vgg11_bn(n_class=200,input_res=64,weights=None):
+def vgg11_bn(n_class=200, input_res=64, weights=None, bias=False):
     """
     Converts maxpools to avgpool and makes usable via library
     """
@@ -24,9 +24,10 @@ def vgg11_bn(n_class=200,input_res=64,weights=None):
 #                                  model_ft.avgpool,
                                  nn.Flatten(),model_ft.classifier)
         
-        # remove conv bias
-        for each in [0,4,8,11,15,18,22,25]:
-            model_ft[each].bias = None
+        # remove conv bias if desired
+        if not bias:
+            for each in [0,4,8,11,15,18,22,25]:
+                model_ft[each].bias = None
         
         model_ft[0].stride=2
 
@@ -36,7 +37,7 @@ def vgg11_bn(n_class=200,input_res=64,weights=None):
     return model_ft
     
     
-def vgg16_bn(n_class=200, input_res=64, weights=None):
+def vgg16_bn(n_class=200, input_res=64, weights=None, bias=False):
     
     if weights is None:
         weights = models.VGG16_BN_Weights.IMAGENET1K_V1
@@ -47,7 +48,8 @@ def vgg16_bn(n_class=200, input_res=64, weights=None):
     layers = []
     for each in model.features:
         if type(each) == torch.nn.Conv2d:
-            each.bias = None
+            if not bias:
+                each.bias = None
             layers.append(each)
 
         elif type(each) == torch.nn.modules.MaxPool2d:
