@@ -1005,10 +1005,19 @@ class avgpool2d(torch.nn.Module):
         self.layer = pool_layer.to(self.device).type(self.dtype)
         
         #enforcing symmetric
-        if self.layer.kernel_size == 2:
-            assert self.layer.padding == 0
-        elif self.layer.kernel_size>2:
-            assert self.layer.kernel_size[0] - 2*self.layer.padding[0] == 1
+        assert type(self.layer.stride) == int
+        
+        # if self.layer.kernel_size == 2:
+        #     assert self.layer.padding == 0
+        # elif self.layer.kernel_size>2:
+        #     assert self.layer.kernel_size[0] - 2*self.layer.padding[0] == 1
+
+        
+        # assert self.layer.stride[0] == self.layer.stride[1] 
+        # assert self.layer.padding[0] == self.layer.padding[1]
+        # assert self.layer.kernel_size[0] == self.layer.kernel_size[1]
+        # assert self.layer.kernel_size[0] - 2*self.layer.padding[0] == 1 ## padding same                         
+                     
         
         self.output_shape = torch.tensor(
             (self.input_shape[0],
